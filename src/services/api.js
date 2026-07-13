@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3001'
+const API_URL = 'https://uptime-tracker-backend-production.up.railway.app'
 
 export async function getSites() {
   const response = await fetch(`${API_URL}/sites`)
