@@ -1,21 +1,21 @@
 import React from 'react';
-import { Activity, RefreshCw, Info, CheckCircle2 } from 'lucide-react';
+import { Activity, RefreshCw } from 'lucide-react';
 
-function Header({ isChecking, onRunCheck, lastRefresh, onOpenInfo, autoRefresh, setAutoRefresh }) {
+function Header({ isChecking, onRunCheck, autoRefresh, setAutoRefresh }) {
   return (
     <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-30 shadow-sm">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           
           {/* Brand & Student Identity */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-sm">
+            <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white shadow-sm">
               <Activity className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-bold text-white tracking-tight">Website Uptime Monitor</h1>
-                <span className="text-[11px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded-full">
+                <h1 className="text-base font-bold text-white tracking-tight">Website Uptime Monitor</h1>
+                <span className="text-[10px] font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded">
                   CSE2025 Project
                 </span>
               </div>
@@ -26,7 +26,7 @@ function Header({ isChecking, onRunCheck, lastRefresh, onOpenInfo, autoRefresh, 
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center gap-2.5">
             {/* Auto refresh button */}
             <button
               onClick={() => setAutoRefresh(!autoRefresh)}
@@ -39,16 +39,6 @@ function Header({ isChecking, onRunCheck, lastRefresh, onOpenInfo, autoRefresh, 
             >
               <span className={`w-2 h-2 rounded-full ${autoRefresh ? 'bg-emerald-400' : 'bg-slate-500'}`} />
               Auto-Sync: {autoRefresh ? '30s' : 'Off'}
-            </button>
-
-            {/* Project Details Modal Button */}
-            <button
-              onClick={onOpenInfo}
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium rounded-lg border border-slate-700 flex items-center gap-1.5 transition"
-              title="View AWS architecture and academic project details"
-            >
-              <Info className="w-3.5 h-3.5 text-blue-400" />
-              Project Info
             </button>
 
             {/* Run Manual Check Button */}

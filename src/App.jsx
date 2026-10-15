@@ -3,16 +3,13 @@ import Header from './components/Header';
 import MetricCards from './components/MetricCards';
 import AddSiteForm from './components/AddSiteForm';
 import SiteList from './components/SiteList';
-import ProjectInfoModal from './components/ProjectInfoModal';
 import { getSites, addSite, checkSites, deleteSite } from './services/api';
-import { Server, Cloud, Database, Bell, Clock, ShieldCheck, CheckCircle2 } from 'lucide-react';
 
 function App() {
   const [sites, setSites] = useState([]);
   const [lastRefresh, setLastRefresh] = useState(null);
   const [isChecking, setIsChecking] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [isInfoOpen, setIsInfoOpen] = useState(false);
   const isFetchingRef = useRef(false);
 
   const loadData = useCallback(async () => {
@@ -63,7 +60,7 @@ function App() {
     if (!autoRefresh) return;
     const interval = setInterval(() => {
       loadData();
-    }, 30000); // 30-second poll
+    }, 30000); // 30-second interval
     return () => clearInterval(interval);
   }, [loadData, autoRefresh]);
 
@@ -73,8 +70,6 @@ function App() {
       <Header
         isChecking={isChecking}
         onRunCheck={runCheck}
-        lastRefresh={lastRefresh}
-        onOpenInfo={() => setIsInfoOpen(true)}
         autoRefresh={autoRefresh}
         setAutoRefresh={setAutoRefresh}
       />
@@ -82,30 +77,26 @@ function App() {
       {/* Main Student Dashboard */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full space-y-6">
         
-        {/* Section 1: Overview Metric Cards */}
-        <div>
-          <MetricCards sites={sites} />
-        </div>
+        {/* Simple Summary Metric Cards */}
+        <MetricCards sites={sites} />
 
-        {/* Section 2: Add New Website Form */}
-        <div>
-          <AddSiteForm onAdd={handleAdd} />
-        </div>
+        {/* Add Website Form */}
+        <AddSiteForm onAdd={handleAdd} />
 
-        {/* Section 3: Monitored Websites List */}
+        {/* Monitored Websites List */}
         <div>
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-white tracking-wide">
+              <h2 className="text-sm font-semibold text-white tracking-wide">
                 Monitored Websites
               </h2>
-              <span className="text-xs bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-mono font-medium">
+              <span className="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono font-medium">
                 {sites.length} Active
               </span>
             </div>
             <span className="text-xs text-slate-400">
               {lastRefresh
-                ? `Last sync: ${lastRefresh.toLocaleTimeString()}`
+                ? `Last updated: ${lastRefresh.toLocaleTimeString()}`
                 : 'Connecting...'}
             </span>
           </div>
@@ -113,105 +104,54 @@ function App() {
           <SiteList sites={sites} onDelete={handleDelete} />
         </div>
 
-        {/* Section 4: AWS Cloud Architecture Explanation (Clear for Viva & Teacher Review) */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-3">
-            <div>
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Cloud className="w-4 h-4 text-orange-400" />
-                AWS Cloud Architecture & Services
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Architecture deployed in AWS Region: <code className="text-orange-300 font-mono">ap-southeast-2</code> (Sydney)
-              </p>
-            </div>
-            <button
-              onClick={() => setIsInfoOpen(true)}
-              className="text-xs text-blue-400 hover:text-blue-300 underline font-medium"
-            >
-              Full Course Details &rarr;
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
-            <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
-              <span className="font-semibold text-white flex items-center gap-1.5 mb-1">
-                <Server className="w-3.5 h-3.5 text-blue-400" />
-                AWS Lambda (Compute)
-              </span>
-              <p className="text-slate-400 text-[11px] leading-relaxed">
-                Serverless Node.js 20.x functions (<code className="text-slate-300">UptimeTrackerApiHandler</code> & <code className="text-slate-300">UptimeTrackerHealthChecker</code>) executing health checks without managing servers.
-              </p>
+        {/* Basic & Rudimentary Project Architecture Notes */}
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs">
+          <h3 className="font-semibold text-white mb-2.5 flex items-center gap-1.5 text-xs">
+            <span>☁️</span> AWS Architecture & Services Used
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-400 text-[11px]">
+            <div className="bg-slate-950/50 p-2.5 rounded border border-slate-800/80">
+              <strong className="text-slate-200 block mb-0.5">Region:</strong>
+              <span><code className="text-orange-400 font-mono">ap-southeast-2</code> (Sydney)</span>
             </div>
 
-            <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
-              <span className="font-semibold text-white flex items-center gap-1.5 mb-1">
-                <Cloud className="w-3.5 h-3.5 text-emerald-400" />
-                Amazon API Gateway
-              </span>
-              <p className="text-slate-400 text-[11px] leading-relaxed">
-                HTTP REST API proxy routing incoming frontend requests to Lambda with automated CORS headers.
-              </p>
+            <div className="bg-slate-950/50 p-2.5 rounded border border-slate-800/80">
+              <strong className="text-slate-200 block mb-0.5">Compute (AWS Lambda):</strong>
+              <span>Node.js 20.x serverless handlers (<code className="text-slate-300">UptimeTrackerApiHandler</code>)</span>
             </div>
 
-            <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
-              <span className="font-semibold text-white flex items-center gap-1.5 mb-1">
-                <Clock className="w-3.5 h-3.5 text-amber-400" />
-                Amazon EventBridge
-              </span>
-              <p className="text-slate-400 text-[11px] leading-relaxed">
-                Scheduled automated cron rule (<code className="text-slate-300">UptimeEveryMinuteCheck</code>) invoking health checks every 60 seconds.
-              </p>
+            <div className="bg-slate-950/50 p-2.5 rounded border border-slate-800/80">
+              <strong className="text-slate-200 block mb-0.5">API Gateway:</strong>
+              <span>HTTP REST proxy with CORS enabled for frontend requests</span>
             </div>
 
-            <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
-              <span className="font-semibold text-white flex items-center gap-1.5 mb-1">
-                <Bell className="w-3.5 h-3.5 text-rose-400" />
-                Amazon SNS (Alerts)
-              </span>
-              <p className="text-slate-400 text-[11px] leading-relaxed">
-                Notification topic (<code className="text-slate-300">UptimeDowntimeAlerts</code>) dispatching alerts when a monitored website goes down.
-              </p>
+            <div className="bg-slate-950/50 p-2.5 rounded border border-slate-800/80">
+              <strong className="text-slate-200 block mb-0.5">EventBridge Cron:</strong>
+              <span>Automated 1-minute schedule (<code className="text-slate-300">UptimeEveryMinuteCheck</code>)</span>
             </div>
 
-            <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
-              <span className="font-semibold text-white flex items-center gap-1.5 mb-1">
-                <Database className="w-3.5 h-3.5 text-purple-400" />
-                Database Tier
-              </span>
-              <p className="text-slate-400 text-[11px] leading-relaxed">
-                Amazon RDS PostgreSQL schema with fallback storage storing response times and uptime logs.
-              </p>
+            <div className="bg-slate-950/50 p-2.5 rounded border border-slate-800/80">
+              <strong className="text-slate-200 block mb-0.5">Alerts (Amazon SNS):</strong>
+              <span>Notification topic (<code className="text-slate-300">UptimeDowntimeAlerts</code>) for downtime</span>
             </div>
 
-            <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
-              <span className="font-semibold text-white flex items-center gap-1.5 mb-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
-                Vercel + GitHub CI/CD
-              </span>
-              <p className="text-slate-400 text-[11px] leading-relaxed">
-                Static frontend deployed on global CDN with automatic deployments from git pushes to <code className="text-slate-300">main</code>.
-              </p>
+            <div className="bg-slate-950/50 p-2.5 rounded border border-slate-800/80">
+              <strong className="text-slate-200 block mb-0.5">Hosting:</strong>
+              <span>Vercel (React Frontend) + GitHub CI/CD</span>
             </div>
           </div>
         </div>
 
       </main>
 
-      {/* Course Info Modal */}
-      <ProjectInfoModal
-        isOpen={isInfoOpen}
-        onClose={() => setIsInfoOpen(false)}
-      />
-
       {/* College Project Submission Footer */}
       <footer className="border-t border-slate-800/80 bg-slate-900/60 py-4 text-center text-xs text-slate-400 mt-auto">
         <div className="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p>
-            CSE2025: AWS Solution Architect · B.Tech CSE Project Submission
+            CSE2025: AWS Solution Architect · College Project Submission
           </p>
           <p>
-            Nilam Sikdar (24BCC7025) · Faculty Guide: Dr Renita R · VIT-AP University
+            Nilam Sikdar (24BCC7025) · Guide: Dr Renita R · VIT-AP University
           </p>
         </div>
       </footer>
