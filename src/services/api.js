@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || 'https://qos9dvtda8.execute-api.ap-southeast-2.amazonaws.com';
 
 // Seed demo sites for offline/standalone mode
 const DEFAULT_SITES = [
