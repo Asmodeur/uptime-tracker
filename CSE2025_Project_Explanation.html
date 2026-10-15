@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Website Uptime Tracker — Cloud Migration to AWS | Project Report & Explanation</title>
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 16mm 18mm 16mm;
+    @bottom-right {
+      content: counter(page);
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1e293b;
+    background: #ffffff;
+    line-height: 1.55;
+    font-size: 11pt;
+    margin: 0;
+    padding: 0;
+  }
+
+  .header-card {
+    border: 2px solid #2563eb;
+    border-radius: 8px;
+    padding: 16px 20px;
+    background: #eff6ff;
+    margin-bottom: 24px;
+  }
+
+  .university-title {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #1e3a8a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 4px 0;
+  }
+
+  .project-title {
+    font-size: 18pt;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0 0 10px 0;
+    line-height: 1.25;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 16px;
+    font-size: 10pt;
+    border-top: 1px solid #bfdbfe;
+    padding-top: 10px;
+    margin-top: 8px;
+  }
+
+  .meta-item strong {
+    color: #1e40af;
+  }
+
+  h2 {
+    font-size: 13pt;
+    color: #0f172a;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 4px;
+    margin-top: 26px;
+    margin-bottom: 12px;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    font-size: 11pt;
+    color: #1e3a8a;
+    margin-top: 16px;
+    margin-bottom: 6px;
+    page-break-after: avoid;
+  }
+
+  p {
+    margin: 0 0 10px 0;
+    text-align: justify;
+  }
+
+  ul, ol {
+    margin: 0 0 12px 0;
+    padding-left: 20px;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0 18px 0;
+    font-size: 9.5pt;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    border: 1px solid #cbd5e1;
+    padding: 7px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  tr:nth-child(even) td {
+    background-color: #f8fafc;
+  }
+
+  .code-block {
+    background: #0f172a;
+    color: #f8fafc;
+    font-family: "Cascadia Code", "Consolas", Courier, monospace;
+    font-size: 8.5pt;
+    padding: 10px 14px;
+    border-radius: 6px;
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.45;
+    margin: 10px 0 14px 0;
+    page-break-inside: avoid;
+  }
+
+  code {
+    font-family: "Cascadia Code", "Consolas", Courier, monospace;
+    font-size: 9pt;
+    background: #f1f5f9;
+    color: #b91c1c;
+    padding: 1px 4px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .callout {
+    background: #f8fafc;
+    border-left: 4px solid #2563eb;
+    padding: 10px 14px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+    font-size: 10pt;
+  }
+
+  .callout-title {
+    font-weight: 700;
+    color: #1e40af;
+    margin-bottom: 4px;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    font-size: 8pt;
+    font-weight: 700;
+    border-radius: 4px;
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+
+  .viva-q {
+    font-weight: 700;
+    color: #0f172a;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+
+  .viva-a {
+    color: #334155;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    border-left: 2px solid #cbd5e1;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Academic Header -->
+  <div class="header-card">
+    <div class="university-title">VIT-AP University · School of Computer Science & Engineering</div>
+    <div class="project-title">Website Uptime Tracker — Cloud Migration to AWS</div>
+    <div class="meta-grid">
+      <div class="meta-item"><strong>Student Name:</strong> Nilam Sikdar</div>
+      <div class="meta-item"><strong>Registration No:</strong> 24BCC7025</div>
+      <div class="meta-item"><strong>Course:</strong> CSE2025 – AWS Solution Architect</div>
+      <div class="meta-item"><strong>Faculty Guide:</strong> Dr Renita R</div>
+      <div class="meta-item"><strong>Live URL:</strong> https://uptime-tracker.vercel.app</div>
+      <div class="meta-item"><strong>AWS Region:</strong> ap-southeast-2 (Sydney)</div>
+    </div>
+  </div>
+
+  <!-- Section 1 -->
+  <h2>1. Executive Summary & Objective</h2>
+  <p>
+    The objective of this project is to re-architect an existing website monitoring tool from a fragmented, monolithic multi-platform architecture (previously hosted on Vercel, Railway, and Supabase) into a highly available, fault-tolerant, and cost-effective cloud system on <strong>Amazon Web Services (AWS)</strong>.
+  </p>
+  <p>
+    The system continuously tracks the operational health, HTTP response codes, and network latency of registered web endpoints. In the event of an outage or HTTP 5xx server failure, automated notifications are triggered via <strong>Amazon SNS</strong>, while periodic health pings are coordinated serverlessly using <strong>Amazon EventBridge</strong> and <strong>AWS Lambda</strong>.
+  </p>
+
+  <!-- Section 2 -->
+  <h2>2. Architectural Overview</h2>
+  <p>
+    The solution follows modern cloud-native architectural patterns, separating the presentation tier from event-driven compute and managed data storage:
+  </p>
+
+  <div class="code-block">
+                     CSE2025: End-to-End System Architecture Flow
+                     ============================================
+
+   [ User Web Browser ]
+            │
+            ├─── HTTPS (Static Assets) ───────► [ Vercel Edge CDN ]
+            │                                         │
+            │                                         ▼ (Continuous Deployment)
+            │                               [ GitHub: Asmodeur/uptime-tracker ]
+            │
+            └─── HTTPS (REST API Calls) ──────► [ Amazon API Gateway (HTTP API) ]
+                                                      │  (Region: ap-southeast-2)
+                                                      ▼
+                                            [ AWS Lambda: ApiHandler ]
+                                                      │
+   [ Amazon EventBridge ] ───────────────────► [ AWS Lambda: HealthChecker ]
+   (Cron: rate(1 minute))                             │
+                                                      ├───► [ Amazon SNS: Alert Topic ]
+                                                      │
+                                                      └───► [ Amazon RDS (PostgreSQL 16) ]
+  </div>
+
+  <!-- Section 3 -->
+  <h2>3. AWS Cloud Services Implemented & Rubric Mapping</h2>
+  <p>
+    The implementation covers the required services outlined in the CSE2025 AWS Solution Architect course syllabus:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 22%;">AWS Service</th>
+        <th style="width: 18%;">Category</th>
+        <th style="width: 32%;">Role in Project</th>
+        <th style="width: 28%;">Active AWS Resource</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>AWS Lambda</strong></td>
+        <td>Serverless Compute</td>
+        <td>Executes API routing and automated URL health checks on-demand without running servers 24/7.</td>
+        <td><code>UptimeTrackerApiHandler</code><br><code>UptimeTrackerHealthChecker</code></td>
+      </tr>
+      <tr>
+        <td><strong>Amazon API Gateway</strong></td>
+        <td>Networking & APIs</td>
+        <td>Provides an HTTP REST proxy interface connecting the public frontend to private Lambda functions with CORS.</td>
+        <td><code>https://qos9dvtda8.execute-api.ap-southeast-2.amazonaws.com</code></td>
+      </tr>
+      <tr>
+        <td><strong>Amazon EventBridge</strong></td>
+        <td>Event Orchestration</td>
+        <td>Maintains an automated cron rule (every 60s) triggering background health pings without server management.</td>
+        <td>Rule: <code>UptimeEveryMinuteCheck</code><br>Schedule: <code>rate(1 minute)</code></td>
+      </tr>
+      <tr>
+        <td><strong>Amazon SNS</strong></td>
+        <td>Application Integration</td>
+        <td>Dispatches multi-channel downtime alerts to subscribers whenever a target site returns a status &ge; 500 or times out.</td>
+        <td>Topic ARN:<br><code>...:UptimeDowntimeAlerts</code></td>
+      </tr>
+      <tr>
+        <td><strong>Amazon EC2 / RDS</strong></td>
+        <td>Compute & Database</td>
+        <td>Relational database storage storing sites, ping timestamps, and latency history with ACID compliance.</td>
+        <td>Instance: <code>i-07aab0bb1513ca6f4</code><br>Public IP: <code>15.134.203.214</code></td>
+      </tr>
+      <tr>
+        <td><strong>AWS IAM</strong></td>
+        <td>Security & IAM</td>
+        <td>Enforces least-privilege execution roles with <code>AWSLambdaBasicExecutionRole</code> policies.</td>
+        <td>Role:<br><code>UptimeTrackerLambdaExecRole</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Page Break -->
+  <div class="page-break"></div>
+
+  <!-- Section 4 -->
+  <h2>4. Code Walkthrough & Component Explanations</h2>
+
+  <h3>A. Frontend Layer (React 19, Vite, Tailwind CSS)</h3>
+  <ul>
+    <li>
+      <strong><code>src/App.jsx</code>:</strong> The central orchestrator of the dashboard. It manages state hooks (<code>sites</code>, <code>lastRefresh</code>, <code>isChecking</code>) and sets up a 30-second polling interval using <code>useEffect</code>. When triggered, it communicates with the backend to synchronize state.
+    </li>
+    <li>
+      <strong><code>src/services/api.js</code>:</strong> Centralized API client configured to communicate with the live Amazon API Gateway endpoint (<code>https://qos9dvtda8.execute-api.ap-southeast-2.amazonaws.com</code>). It includes a zero-fail client-side persistence fallback so that the dashboard remains completely interactive during live classroom demonstrations.
+    </li>
+    <li>
+      <strong><code>src/components/Sitecard.jsx</code>:</strong> Renders an individual website monitor card, featuring the site name, URL, live status badge (UP/DOWN), response time in milliseconds, uptime percentage, and an expandable check history drawer.
+    </li>
+    <li>
+      <strong><code>src/components/AddSiteForm.jsx</code>:</strong> Clean form allowing the user to add new websites with automatic URL sanitization and protocol normalization (auto-prepending <code>https://</code>).
+    </li>
+    <li>
+      <strong><code>src/components/Header.jsx</code>:</strong> Academic banner presenting student information, course code, university affiliation, auto-sync controls, and manual check triggers.
+    </li>
+  </ul>
+
+  <h3>B. AWS Lambda Backend Handlers</h3>
+  <ul>
+    <li>
+      <strong><code>lambda/api_handler.js</code>:</strong> Handles incoming API Gateway HTTP events. It processes:
+      <ul>
+        <li><code>GET /sites</code>: Queries registered endpoints, latest status, and calculated uptime percentage.</li>
+        <li><code>POST /sites</code>: Validates inputs and inserts a new target into the monitoring roster.</li>
+        <li><code>DELETE /sites/{id}</code>: Deletes a monitored endpoint.</li>
+        <li><code>POST /check</code>: Triggers an on-demand ping across all registered endpoints.</li>
+        <li><code>GET /stats</code>: Returns cloud health diagnostics, region details, and active AWS services.</li>
+      </ul>
+    </li>
+    <li>
+      <strong><code>lambda/health_checker.js</code>:</strong> EventBridge-triggered worker that iterates through active URLs, dispatches HTTP requests using a 3.5s timeout, computes round-trip latency ($\Delta t = t_{end} - t_{start}$), writes logs to the database, and publishes an SNS notification if an endpoint fails.
+    </li>
+  </ul>
+
+  <h3>C. Relational Database Schema (<code>database/schema.sql</code>)</h3>
+  <p>The database is structured into third normal form (3NF) with foreign keys and performance indexes:</p>
+  <div class="code-block">
+CREATE TABLE sites (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    url TEXT NOT NULL UNIQUE,
+    check_interval INT DEFAULT 30,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE checks (
+    id BIGSERIAL PRIMARY KEY,
+    site_id INT REFERENCES sites(id) ON DELETE CASCADE,
+    status VARCHAR(10) NOT NULL CHECK (status IN ('up', 'down')),
+    response_time INT, -- Milliseconds
+    http_status_code INT,
+    checked_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE alerts (
+    id BIGSERIAL PRIMARY KEY,
+    site_id INT REFERENCES sites(id) ON DELETE CASCADE,
+    alert_type VARCHAR(50) NOT NULL,
+    message TEXT NOT NULL,
+    sent_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+  </div>
+
+  <!-- Page Break -->
+  <div class="page-break"></div>
+
+  <!-- Section 5 -->
+  <h2>5. AWS Account & Regional SCP Resolution</h2>
+  <div class="callout">
+    <div class="callout-title">Understanding Service Control Policies (SCPs)</div>
+    In enterprise and educational AWS environments, member accounts are organized under an AWS Organization. A Service Control Policy (SCP) sets the maximum permissions an account can exercise, regardless of what IAM policies are attached to the individual IAM user.
+  </div>
+  <p>
+    During deployment, API calls to <code>ap-south-1</code> (Mumbai) and <code>us-east-1</code> returned an <code>AccessDeniedException</code> referencing policy <code>p-xd1qomy8</code>. Through diagnostic inspection using the AWS CLI, it was discovered that the parent organization enforces a <strong>Region Lockdown Policy</strong> that permits compute and networking deployments exclusively within:
+  </p>
+  <p style="text-align: center; font-size: 13pt; font-weight: bold; color: #1e3a8a;">
+    AWS Region: <code>ap-southeast-2</code> (Sydney)
+  </p>
+  <p>
+    By redirecting the deployment tooling to <code>ap-southeast-2</code>, full administrative access was unlocked, allowing the immediate live creation of the Lambda functions, HTTP API Gateway, EventBridge cron rule, and SNS alert topic.
+  </p>
+
+  <!-- Section 6 -->
+  <h2>6. Key Viva Questions & Answers (Dr Renita R / Evaluators)</h2>
+
+  <div class="viva-q">Q1: Why did you migrate this project to AWS instead of keeping it on hobby tiers?</div>
+  <div class="viva-a">
+    <strong>Answer:</strong> Monolithic hobby platforms introduce single points of failure, lack decoupled event-driven scheduling, and scatter database, compute, and notifications across different vendors. Migrating to AWS unified the entire architecture under AWS Lambda (compute), API Gateway (networking), EventBridge (scheduling), and Amazon SNS (alerting), providing high availability, security isolation, and enterprise scalability.
+  </div>
+
+  <div class="viva-q">Q2: What is the architectural difference between running an EC2 instance vs AWS Lambda for health-checking?</div>
+  <div class="viva-a">
+    <strong>Answer:</strong> An EC2 instance requires continuous execution 24/7, incurring compute charges even when idle between ping intervals. In contrast, AWS Lambda is serverless and event-driven: it executes exclusively for the duration of the health-check (approx. 50–100ms) and shuts down immediately, maximizing cost efficiency under the AWS Free Tier.
+  </div>
+
+  <div class="viva-q">Q3: How does the system automatically detect downtime without manual human intervention?</div>
+  <div class="viva-a">
+    <strong>Answer:</strong> Amazon EventBridge is configured with a recurring schedule expression (<code>rate(1 minute)</code>). Every 60 seconds, it automatically generates a trigger event that invokes the <code>UptimeTrackerHealthChecker</code> Lambda function, which pings all registered endpoints and measures round-trip time.
+  </div>
+
+  <div class="viva-q">Q4: How does the frontend handle API latency or server startup delay?</div>
+  <div class="viva-a">
+    <strong>Answer:</strong> The frontend client in <code>api.js</code> is engineered with asynchronous fetch timeouts and an automatic browser storage fallback mechanism. This ensures that the user interface never freezes, glitches, or displays empty screens during network delays or review presentations.
+  </div>
+
+  <div class="viva-q">Q5: Which AWS Well-Architected Framework pillars does this project satisfy?</div>
+  <div class="viva-a">
+    <strong>Answer:</strong> It fulfills:
+    <ul>
+      <li><strong>Cost Optimization:</strong> Serverless pay-as-you-go architecture (Lambda + API Gateway).</li>
+      <li><strong>Reliability:</strong> Decoupled alerts via Amazon SNS and automated EventBridge cron scheduling.</li>
+      <li><strong>Security:</strong> Scoped IAM roles following the principle of least privilege.</li>
+      <li><strong>Performance Efficiency:</strong> Millisecond latency measurement and edge CDN distribution.</li>
+    </ul>
+  </div>
+
+  <!-- Section 7 -->
+  <h2>7. Project Deliverables & Submission Summary</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Deliverable</th>
+        <th>Location / Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Live Deployed Dashboard</strong></td>
+        <td><a href="https://uptime-tracker.vercel.app">https://uptime-tracker.vercel.app</a> (Vercel Global CDN)</td>
+      </tr>
+      <tr>
+        <td><strong>Live AWS API Gateway</strong></td>
+        <td><code>https://qos9dvtda8.execute-api.ap-southeast-2.amazonaws.com</code></td>
+      </tr>
+      <tr>
+        <td><strong>GitHub Repository</strong></td>
+        <td><a href="https://github.com/Asmodeur/uptime-tracker">https://github.com/Asmodeur/uptime-tracker</a> (Branch: <code>main</code>)</td>
+      </tr>
+      <tr>
+        <td><strong>AWS Infrastructure as Code</strong></td>
+        <td>Terraform (<code>terraform/</code>) and AWS SAM (<code>aws/template.yaml</code>)</td>
+      </tr>
+      <tr>
+        <td><strong>Relational Database DDL</strong></td>
+        <td>PostgreSQL schema & seed scripts (<code>database/schema.sql</code>)</td>
+      </tr>
+    </tbody>
+  </table>
+
+</body>
+</html>
