@@ -65,7 +65,7 @@ function Sitecard({ id, name, url, status, responseTime, uptimePercentage, recen
         <div className="grid grid-cols-2 gap-3 mb-4 bg-slate-900/50 p-3 rounded-xl border border-slate-800">
           <div>
             <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">
-              Response Latency
+              CloudWatch Latency
             </span>
             <div className="flex items-baseline gap-1 mt-0.5">
               <span className={`text-lg font-bold font-mono ${latencyBadgeColor}`}>
@@ -79,7 +79,7 @@ function Sitecard({ id, name, url, status, responseTime, uptimePercentage, recen
 
           <div>
             <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">
-              Uptime Health
+              RDS Uptime Record
             </span>
             <div className="flex items-baseline gap-1 mt-0.5">
               <span className="text-lg font-bold font-mono text-emerald-400">

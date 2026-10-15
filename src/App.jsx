@@ -83,6 +83,25 @@ function App() {
         {/* Simple Summary Metric Cards */}
         <MetricCards sites={sites} />
 
+        {/* AWS Cloud Services Architecture Ribbon */}
+        <div className="mb-6 p-3 bg-slate-900/90 border border-slate-800 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 text-xs">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-orange-500/10 text-orange-400 font-semibold border border-orange-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse" />
+              AWS Architecture Integrated
+            </span>
+            <span className="text-slate-400">
+              AWS Lambda (Compute) · Amazon RDS (PostgreSQL) · EventBridge (Cron) · CloudWatch (Metrics) · SNS (Alerts)
+            </span>
+          </div>
+          <button
+            onClick={() => setIsInfoOpen(true)}
+            className="text-blue-400 hover:text-blue-300 font-medium underline underline-offset-2 shrink-0 self-start sm:self-auto"
+          >
+            View Cloud Specs &rarr;
+          </button>
+        </div>
+
         {/* Add Website Form */}
         <AddSiteForm onAdd={handleAdd} />
 
