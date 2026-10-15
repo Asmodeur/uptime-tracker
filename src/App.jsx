@@ -1,61 +1,131 @@
-import { useState, useEffect } from 'react'
-import Header from './components/Header'
-import SiteList from './components/SiteList'
-import AddSiteForm from './components/AddSiteForm'
-import { getSites, addSite, checkSites } from './services/api'
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import Header from './components/Header';
+import MetricCards from './components/MetricCards';
+import AddSiteForm from './components/AddSiteForm';
+import SiteList from './components/SiteList';
+import ProjectInfoModal from './components/ProjectInfoModal';
+import { getSites, addSite, checkSites, deleteSite } from './services/api';
 
 function App() {
-  const [sites, setSites] = useState([])
-  const [lastRefresh, setLastRefresh] = useState(null)
-  const [isChecking, setIsChecking] = useState(false)
+  const [sites, setSites] = useState([]);
+  const [lastRefresh, setLastRefresh] = useState(null);
+  const [isChecking, setIsChecking] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const isFetchingRef = useRef(false);
 
-  const loadSites = async () => {
-    const data = await getSites()
-    setSites(data)
-  }
+  const loadData = useCallback(async () => {
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
+    try {
+      const sitesData = await getSites();
+      if (Array.isArray(sitesData)) {
+        setSites(sitesData);
+        setLastRefresh(new Date());
+      }
+    } catch (err) {
+      console.warn('Sync note:', err.message);
+    } finally {
+      isFetchingRef.current = false;
+    }
+  }, []);
 
   const runCheck = async () => {
-    setIsChecking(true)
-    await checkSites()
-    await loadSites()
-    setLastRefresh(new Date())
-    setIsChecking(false)
-  }
+    if (isChecking) return;
+    setIsChecking(true);
+    try {
+      await checkSites();
+      await loadData();
+    } catch (err) {
+      console.error('Check failed:', err);
+    } finally {
+      setIsChecking(false);
+    }
+  };
 
   const handleAdd = async (newSite) => {
-    await addSite(newSite)
-    await loadSites()
-  }
+    await addSite(newSite);
+    await loadData();
+  };
 
-  const handleDelete = (deletedId) => {
-    setSites(sites.filter(site => site.id !== deletedId))
-  }
+  const handleDelete = async (deletedId) => {
+    try {
+      await deleteSite(deletedId);
+      setSites((prev) => prev.filter((s) => s.id !== deletedId));
+    } catch (err) {
+      console.error('Delete error:', err);
+    }
+  };
 
   useEffect(() => {
-    loadSites()
-    runCheck()
-    const interval = setInterval(() => runCheck(), 30000)
-    return () => clearInterval(interval)
-  }, [])
+    loadData();
+    if (!autoRefresh) return;
+    const interval = setInterval(() => {
+      loadData();
+    }, 30000); // 30-second interval
+    return () => clearInterval(interval);
+  }, [loadData, autoRefresh]);
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      <Header />
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <p className="text-gray-400 text-sm">
-            {isChecking
-              ? "⏳ Checking sites..."
-              : lastRefresh
-              ? `Last checked: ${lastRefresh.toLocaleTimeString()}`
-              : "Loading..."}
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white">
+      {/* Navigation Header */}
+      <Header
+        isChecking={isChecking}
+        onRunCheck={runCheck}
+        lastRefresh={lastRefresh}
+        onOpenInfo={() => setIsInfoOpen(true)}
+        autoRefresh={autoRefresh}
+        setAutoRefresh={setAutoRefresh}
+      />
+
+      {/* Main Content */}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 flex-1 w-full">
+        {/* Simple Summary Metric Cards */}
+        <MetricCards sites={sites} />
+
+        {/* Add Website Form */}
+        <AddSiteForm onAdd={handleAdd} />
+
+        {/* Monitored Sites Header */}
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="text-sm font-semibold text-white tracking-wide">
+              Monitored Websites
+            </h2>
+            <span className="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono font-medium">
+              {sites.length} Active
+            </span>
+          </div>
+          <span className="text-xs text-slate-400">
+            {lastRefresh
+              ? `Last updated: ${lastRefresh.toLocaleTimeString()}`
+              : 'Connecting...'}
+          </span>
+        </div>
+
+        {/* Sites Grid */}
+        <SiteList sites={sites} onDelete={handleDelete} />
+      </main>
+
+      {/* Academic Project Info Modal */}
+      <ProjectInfoModal
+        isOpen={isInfoOpen}
+        onClose={() => setIsInfoOpen(false)}
+      />
+
+      {/* Academic College Project Footer */}
+      <footer className="border-t border-slate-800 bg-slate-900/60 py-5 text-center text-xs text-slate-400">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p>
+            CSE2025: AWS Solution Architect · Cloud Migration Project
+          </p>
+          <p>
+            Developed by <span className="text-white font-medium">Nilam Sikdar</span> (24BCC7025) · Faculty Guide: <span className="text-white font-medium">Dr Renita R</span> · VIT-AP University
           </p>
         </div>
-        <AddSiteForm onAdd={handleAdd} />
-        <SiteList sites={sites} onDelete={handleDelete} />
-      </div>
+      </footer>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,0 +1,221 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  CSE2025 - AWS Solution Architect Project
+  Website Uptime Tracker - Cloud Migration to AWS
+  Student: Nilam Sikdar (Roll No: 24BCC7025) - VIT-AP University
+  Faculty: Dr Renita R
+
+Parameters:
+  AlertEmail:
+    Type: String
+    Default: nilam.sikdar@example.com
+    Description: Email address subscribed to Amazon SNS downtime alerts
+  DbUsername:
+    Type: String
+    Default: postgresadmin
+    Description: Master username for Amazon RDS PostgreSQL
+  DbPassword:
+    Type: String
+    NoEcho: true
+    Default: UptimeTracker2026Secure!
+    Description: Master password for Amazon RDS PostgreSQL
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 256
+    Runtime: nodejs20.x
+    Architectures:
+      - x86_64
+    Environment:
+      Variables:
+        DB_HOST: !GetAtt RdsPostgresInstance.Endpoint.Address
+        DB_PORT: '5432'
+        DB_NAME: uptime_db
+        DB_USER: !Ref DbUsername
+        DB_PASSWORD: !Ref DbPassword
+        AWS_SNS_TOPIC_ARN: !Ref WebsiteUptimeAlertsTopic
+        REPORTS_BUCKET_NAME: !Ref ReportsStorageBucket
+
+Resources:
+  # ============================================================================
+  # 1. AWS IAM - Least Privilege Roles & Policies
+  # ============================================================================
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: WebsiteUptimeTracker-SAM-LambdaRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: UptimeTrackerServiceAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudwatch:PutMetricData
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: !Ref WebsiteUptimeAlertsTopic
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                Resource: !Sub '${ReportsStorageBucket.Arn}/*'
+
+  # ============================================================================
+  # 2. AWS Compute - AWS Lambda Functions & API Gateway
+  # ============================================================================
+  UptimeApiGateway:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Name: WebsiteUptimeTracker-HttpApi
+      CorsConfiguration:
+        AllowOrigins:
+          - '*'
+        AllowMethods:
+          - GET
+          - POST
+          - DELETE
+          - OPTIONS
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+
+  BackendApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: WebsiteUptimeTracker-ApiLambda
+      CodeUri: ../lambda/
+      Handler: api_handler.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref UptimeApiGateway
+            Path: /{proxy+}
+            Method: ANY
+        RootPath:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref UptimeApiGateway
+            Path: /
+            Method: ANY
+
+  HealthCheckerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: WebsiteUptimeTracker-HealthChecker
+      CodeUri: ../lambda/
+      Handler: health_checker.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        ScheduledCheck:
+          Type: Schedule
+          Properties:
+            Schedule: rate(1 minute)
+            Name: WebsiteUptimeCheckerSchedule
+            Description: Automatic 1-minute health check ping trigger
+
+  # ============================================================================
+  # 3. Amazon Storage - Amazon S3 Buckets
+  # ============================================================================
+  FrontendStorageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'website-uptime-tracker-ui-${AWS::AccountId}'
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+
+  ReportsStorageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'website-uptime-tracker-reports-${AWS::AccountId}'
+
+  # ============================================================================
+  # 4. Amazon Database - Amazon RDS (PostgreSQL)
+  # ============================================================================
+  RdsPostgresInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: website-uptime-postgres-db
+      Engine: postgres
+      EngineVersion: '16.1'
+      DBInstanceClass: db.t4g.micro
+      AllocatedStorage: '20'
+      StorageType: gp3
+      DBName: uptime_db
+      MasterUsername: !Ref DbUsername
+      MasterUserPassword: !Ref DbPassword
+      PubliclyAccessible: true
+      BackupRetentionPeriod: 0
+      DeleteAutomatedBackups: true
+
+  # ============================================================================
+  # 5. Amazon Alerting & Monitoring - SNS & CloudWatch
+  # ============================================================================
+  WebsiteUptimeAlertsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: WebsiteUptimeAlertsTopic
+      DisplayName: Website Uptime Downtime Alerts
+
+  EmailAlertSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref WebsiteUptimeAlertsTopic
+      Protocol: email
+      Endpoint: !Ref AlertEmail
+
+  HealthCheckerErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: WebsiteUptimeChecker-ErrorAlarm
+      AlarmDescription: Triggers when the Lambda health checker experiences execution errors
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref HealthCheckerFunction
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 0
+      ComparisonOperator: GreaterThanThreshold
+      AlarmActions:
+        - !Ref WebsiteUptimeAlertsTopic
+
+Outputs:
+  ApiUrl:
+    Description: HTTP API Gateway URL
+    Value: !Sub 'https://${UptimeApiGateway}.execute-api.${AWS::Region}.amazonaws.com'
+  FrontendBucket:
+    Description: S3 Static Website Hosting Bucket
+    Value: !Ref FrontendStorageBucket
+  ReportsBucket:
+    Description: S3 Reports Bucket
+    Value: !Ref ReportsStorageBucket
+  RdsEndpoint:
+    Description: RDS PostgreSQL Endpoint Address
+    Value: !GetAtt RdsPostgresInstance.Endpoint.Address
+  SnsTopicArn:
+    Description: SNS Topic ARN for Alerts
+    Value: !Ref WebsiteUptimeAlertsTopic

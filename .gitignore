@@ -12,6 +12,18 @@ dist
 dist-ssr
 *.local
 
+# Environment & Secrets
+.env
+.env.*.local
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.zip
+
+# Local database file
+server/data/*.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
